@@ -1,0 +1,67 @@
+
+
+# macOS
+*.xcuserstate
+*.xcworkspace
+*.xcuserdata
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata
+*.xcworkspace/xcuserdata
+Pods/
+DerivedData/
+
+# Windows
+*.exe
+*.dll
+*.pdb
+*.obj
+*.lib
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Android/Gradle
+/android/.gradle/
+/android/local.properties
+/android/**/gradle-wrapper.jar
+
+# CocoaPods
+/ios/Pods/
+/ios/Podfile.lock
+
+# Firebase/Google Services
+google-services.json
+GoogleService-Info.plist
+crashlytics-build.properties
+firebase_app_id_file.json
+
+# Packaging/Archives
+*.ipa
+*.apk
+*.aab
+*.app
+*.dSYM.zip
+*.dSYM
+*.tar.gz
+*.zip
+*.tgz
+
+# Fastlane
+fastlane/report.xml
+fastlane/screenshots
+fastlane/test_output
+
+# Flutter extras
+.packages
+.melos_tool/
+.melofile
+coverage/
+
+# Sensitive files
+.env
+.env.*
+*.key
+*.pem
+*.crt
