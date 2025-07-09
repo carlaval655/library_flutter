@@ -1,27 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/supabase/supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final authControllerProvider =
-    StateNotifierProvider<AuthController, bool>((ref) => AuthController());
+    StateNotifierProvider<AuthController, AsyncValue<void>>(
+  (ref) => AuthController(),
+);
 
-class AuthController extends StateNotifier<bool> {
-  AuthController() : super(false);
+class AuthController extends StateNotifier<AsyncValue<void>> {
+  AuthController() : super(const AsyncData(null));
 
-  Future<void> login(String email, String password, BuildContext context) async {
+  Future<void> login({
+    required String email,
+    required String password,
+    required BuildContext context,
+  }) async {
+    state = const AsyncLoading();
+
     try {
-      final response = await SupabaseManager.client.auth
+      final res = await Supabase.instance.client.auth
           .signInWithPassword(email: email, password: password);
 
-      if (response.user != null) {
+      if (res.user != null) {
+        state = const AsyncData(null);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login exitoso!")),
+          const SnackBar(content: Text("¡Login exitoso!")),
         );
-        // TODO: Navegar al home
+        // TODO: Navegar a Home
+      } else {
+        throw Exception("Credenciales inválidas");
       }
     } catch (e) {
+      state = AsyncError(e, StackTrace.current);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+
+  Future<void> register({
+    required String email,
+    required String password,
+    required String nombre,
+    required String apellido,
+    required int edad,
+    required BuildContext context,
+  }) async {
+    state = const AsyncLoading();
+
+    try {
+      final res = await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      final userId = res.user?.id;
+
+      if (userId == null) {
+        throw Exception("No se pudo registrar usuario");
+      }
+
+      /// Guardar datos adicionales en `profiles`:
+      await Supabase.instance.client.from('profiles').insert({
+        'id': userId,
+        'email': email,
+        'nombre': nombre,
+        'apellido': apellido,
+        'edad': edad,
+      });
+
+      state = const AsyncData(null);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("¡Registro exitoso!")),
+      );
+
+      // TODO: Navegar a Home
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
       );
     }
   }

@@ -1,0 +1,1 @@
+ /Users/carlavalencia/University/Diplomado/Tercer_Modulo_Movil/library_flutter/.dart_tool/flutter_build/b260fbd60abbb040c07710b6e87a8441/native_assets.json: 

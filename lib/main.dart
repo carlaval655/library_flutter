@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_movie_tracker/features/auth/presentation/login_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: MyApp()));
+  
+  await Supabase.initialize(
+    url: 'https://fasglprdodxnhmwlleyh.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhc2dscHJkb2R4bmhtd2xsZXloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4NTQ3OTAsImV4cCI6MjA2NzQzMDc5MH0.HyhOGzWJ-bjcJOXpwGl9cUaopbiQ4UzRKXmBxdaOrwc',
+  );
+
+  runApp(
+    const ProviderScope(child: MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,11 +22,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Library Flutter',
-      home: Scaffold(
-        appBar: AppBar(title: Text('Library Flutter')),
-        body: Center(child: Text('Hello World')),
-      ),
+      title: 'My Movie Tracker',
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      home:  LoginScreen(),
     );
   }
 }
