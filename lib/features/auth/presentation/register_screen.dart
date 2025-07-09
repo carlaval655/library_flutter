@@ -1,18 +1,29 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/services/image_service.dart';
 import 'auth_controller.dart';
 
-class RegisterScreen extends ConsumerWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   RegisterScreen({super.key});
 
+  @override
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController nombreController = TextEditingController();
   final TextEditingController apellidoController = TextEditingController();
   final TextEditingController edadController = TextEditingController();
 
+  File? selectedImage;
+
+  final ImageService _imageService = ImageService();
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
@@ -31,6 +42,26 @@ class RegisterScreen extends ConsumerWidget {
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 32),
+                  GestureDetector(
+                    onTap: () async {
+                      final pickedFile = await _imageService.pickImageFromGallery();
+                      if (pickedFile != null) {
+                        setState(() {
+                          selectedImage = pickedFile;
+                        });
+                      }
+                    },
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: selectedImage != null
+                          ? FileImage(selectedImage!)
+                          : null,
+                      child: selectedImage == null
+                          ? const Icon(Icons.person, size: 50)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   TextField(
                     controller: emailController,
                     decoration: const InputDecoration(labelText: "Email"),
@@ -71,6 +102,7 @@ class RegisterScreen extends ConsumerWidget {
                                   nombre: nombreController.text.trim(),
                                   apellido: apellidoController.text.trim(),
                                   edad: int.tryParse(edadController.text) ?? 0,
+                                  fotoFile: selectedImage,
                                   context: context,
                                 );
                           },

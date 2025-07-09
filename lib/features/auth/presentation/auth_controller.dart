@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_movie_tracker/core/services/image_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final authControllerProvider =
     StateNotifierProvider<AuthController, AsyncValue<void>>(
   (ref) => AuthController(),
 );
+final ImageService _imageService = ImageService();
 
 class AuthController extends StateNotifier<AsyncValue<void>> {
   AuthController() : super(const AsyncData(null));
@@ -44,6 +48,7 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     required String nombre,
     required String apellido,
     required int edad,
+    File? fotoFile,
     required BuildContext context,
   }) async {
     state = const AsyncLoading();
@@ -60,22 +65,29 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
         throw Exception("No se pudo registrar usuario");
       }
 
-      /// Guardar datos adicionales en `profiles`:
+      /// Subir foto si se seleccionó
+      String? fotoUrl;
+      if (fotoFile != null) {
+        fotoUrl = await _imageService.uploadProfileImage(fotoFile, userId);
+      }
+
+      /// Insertar en tabla profiles
       await Supabase.instance.client.from('profiles').insert({
         'id': userId,
         'email': email,
         'nombre': nombre,
         'apellido': apellido,
         'edad': edad,
+        'foto_url': fotoUrl,
       });
 
       state = const AsyncData(null);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("¡Registro exitoso!")),
       );
-
       // TODO: Navegar a Home
     } catch (e) {
+      print("Error en registro: $e");
       state = AsyncError(e, StackTrace.current);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: ${e.toString()}")),
