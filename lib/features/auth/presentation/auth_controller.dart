@@ -5,7 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_movie_tracker/core/services/image_service.dart';
+import 'package:my_movie_tracker/features/content_seen/presentation/content_seen_screen.dart';
+import 'package:my_movie_tracker/features/profile/application/current_user_provider.dart';
 import 'package:my_movie_tracker/features/profile/application/profile_provider.dart';
+import 'package:my_movie_tracker/features/content_seen/application/movies_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final authControllerProvider =
@@ -109,8 +112,14 @@ WidgetsBinding.instance.addPostFrameCallback((_) {
   }
 
   Future<void> logout(BuildContext context) async {
-    await Supabase.instance.client.auth.signOut();
-    context.go('/login');
+final userId = Supabase.instance.client.auth.currentUser?.id;
+if (userId != null) {
+  ref.invalidate(moviesProvider(userId));
+}
+ref.invalidate(userProfileProvider);
+ref.invalidate(currentUserProvider);
+
+await Supabase.instance.client.auth.signOut();
+context.go('/login');
   }
 }
-

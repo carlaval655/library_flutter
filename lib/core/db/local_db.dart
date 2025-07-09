@@ -48,4 +48,20 @@ class LocalDbService {
     final result = await db.query('movies');
     return result.map((e) => MovieModel.fromLocalJson(e)).toList();
   }
+
+  Future<List<MovieModel>> getMoviesByUserId(String userId) async {
+    final db = await database;
+    final result = await db.query(
+      'movies',
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+    return result.map((e) => MovieModel.fromLocalJson(e)).toList();
+  }
+  Future<void> deleteDatabaseFile() async {
+  final dbPath = await getDatabasesPath();
+  final path = join(dbPath, 'movies.db');
+  await deleteDatabase(path);
+  print("Database deleted!");
+}
 }

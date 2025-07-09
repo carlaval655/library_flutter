@@ -1,5 +1,7 @@
+import 'package:my_movie_tracker/features/content_seen/presentation/content_seen_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/services/api_service.dart';
 import '../../../core/db/local_db.dart';
@@ -9,6 +11,15 @@ final searchMoviesProvider =
     StateNotifierProvider<SearchMoviesNotifier, AsyncValue<List<MovieApiResult>>>(
   (ref) => SearchMoviesNotifier(ApiService()),
 );
+
+final moviesProvider = FutureProvider<List<MovieModel>>((ref) async {
+  final db = LocalDbService();
+  final userId = Supabase.instance.client.auth.currentUser?.id;
+  if (userId == null) {
+    return [];
+  }
+  return await db.getMoviesByUserId(userId);
+});
 
 class SearchMoviesNotifier extends StateNotifier<AsyncValue<List<MovieApiResult>>> {
   final ApiService apiService;
@@ -86,8 +97,9 @@ class _AddMovieBottomSheetState extends ConsumerState<AddMovieBottomSheet> {
                       subtitle: Text(movie.releaseDate),
                       onTap: () async {
                         /// Guardamos la película
+                        final userId = Supabase.instance.client.auth.currentUser?.id ?? "NO_USER";
                         final newMovie = MovieModel(
-                          userId: "LOCAL_USER_ID",
+                          userId: userId,
                           title: movie.title,
                           year: int.tryParse(
                                   movie.releaseDate.split('-').first) ??
@@ -99,6 +111,7 @@ class _AddMovieBottomSheetState extends ConsumerState<AddMovieBottomSheet> {
                               "https://image.tmdb.org/t/p/w500${movie.posterPath}",
                         );
                         await dbService.insertMovie(newMovie);
+                        ref.invalidate(moviesProvider);
                         Navigator.pop(context);
                       },
                     );

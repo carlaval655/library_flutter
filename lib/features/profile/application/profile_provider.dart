@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_movie_tracker/features/profile/application/current_user_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Modelo de perfil de usuario
@@ -44,12 +45,6 @@ class ProfileRepository {
     return Profile.fromMap(data);
   }
 }
-
-/// Provider que escucha el usuario actual
-final currentUserProvider = StreamProvider<User?>((ref) {
-  return Supabase.instance.client.auth.onAuthStateChange
-      .map((event) => event.session?.user);
-});
 
 /// Provider del repositorio
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
