@@ -15,57 +15,101 @@ class LoginScreen extends ConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    "Iniciar Sesión",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium,
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.deepPurpleAccent],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Card(
+                  color: Colors.white.withOpacity(0.85),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(height: 32),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(labelText: "Email"),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: "Password"),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: authState is AsyncLoading
-                        ? null
-                        : () {
-                            ref
-                                .read(authControllerProvider.notifier)
-                                .login(
-                                  email: emailController.text.trim(),
-                                  password: passwordController.text.trim(),
-                                  context: context,
-                                );
+                  elevation: 8,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          "Iniciar Sesión",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                color: Colors.deepPurple,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 32,
+                              ),
+                        ),
+                        const SizedBox(height: 40),
+                        TextField(
+                          controller: emailController,
+                          decoration: const InputDecoration(
+                            labelText: "Email",
+                            prefixIcon: Icon(Icons.email, color: Colors.deepPurple),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 24),
+                        TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: "Password",
+                            prefixIcon: Icon(Icons.lock, color: Colors.deepPurple),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: authState is AsyncLoading
+                              ? null
+                              : () {
+                                  ref
+                                      .read(authControllerProvider.notifier)
+                                      .login(
+                                        email: emailController.text.trim(),
+                                        password: passwordController.text.trim(),
+                                        context: context,
+                                      );
+                                },
+                          child: authState is AsyncLoading
+                              ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                )
+                              : const Text(
+                                  "Login",
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                        ),
+                        const SizedBox(height: 20),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => RegisterScreen()));
                           },
-                    child: authState is AsyncLoading
-                        ? const CircularProgressIndicator()
-                        : const Text("Login"),
+                          child: const Text(
+                            "¿No tienes cuenta? Regístrate aquí",
+                            style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => RegisterScreen()));
-                    },
-                    child: const Text("¿No tienes cuenta? Regístrate aquí"),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

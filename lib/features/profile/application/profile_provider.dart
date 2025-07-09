@@ -30,18 +30,11 @@ class Profile {
 
 /// Repositorio para acceder al perfil
 class ProfileRepository {
-  Future<Profile> getUserProfile() async {
-    final session = Supabase.instance.client.auth.currentSession;
-
-    if (session == null) {
-      throw Exception("No hay sesión activa.");
-    }
-
-    final user = session.user;
+  Future<Profile> getUserProfileById(String userId) async {
     final data = await Supabase.instance.client
         .from('profiles')
         .select()
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
     if (data == null) {
@@ -52,6 +45,12 @@ class ProfileRepository {
   }
 }
 
+/// Provider que escucha el usuario actual
+final currentUserProvider = StreamProvider<User?>((ref) {
+  return Supabase.instance.client.auth.onAuthStateChange
+      .map((event) => event.session?.user);
+});
+
 /// Provider del repositorio
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return ProfileRepository();
@@ -59,6 +58,9 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 
 /// Provider del perfil del usuario actual
 final userProfileProvider = FutureProvider<Profile>((ref) async {
+  final userAsync = ref.watch(currentUserProvider);
+  final user = userAsync.valueOrNull;
+  if (user == null) throw Exception("No hay usuario logueado.");
   final repository = ref.watch(profileRepositoryProvider);
-  return repository.getUserProfile();
+  return repository.getUserProfileById(user.id);
 });

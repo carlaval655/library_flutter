@@ -23,10 +23,23 @@ class HomeScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      body: SafeArea(child: screens[index]),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.deepPurple, Colors.purple],
+          ),
+        ),
+        child: SafeArea(child: screens[index]),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: (i) => ref.read(homeIndexProvider.notifier).state = i,
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.grey,
+        iconSize: 28,
+        elevation: 10,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
           BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Visto'),

@@ -12,55 +12,101 @@ class ProfileScreen extends ConsumerWidget {
     final profileAsync = ref.watch(userProfileProvider);
 
     return profileAsync.when(
-      data: (profile) => SingleChildScrollView(
+      data: (profile) => Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurple, Colors.purpleAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: profile.fotoUrl != null
-                        ? NetworkImage(profile.fotoUrl!)
-                        : null,
-                    child: profile.fotoUrl == null
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.person, size: 50),
-                              const SizedBox(height: 8),
-                              const Text("Sin foto"),
-                            ],
-                          )
-                        : null,
+              padding: const EdgeInsets.all(24.0),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 8,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.deepPurple.shade100,
+                        child: CircleAvatar(
+                          radius: 56,
+                          backgroundImage: profile.fotoUrl != null
+                              ? NetworkImage(profile.fotoUrl!)
+                              : null,
+                          backgroundColor: Colors.grey.shade200,
+                          child: profile.fotoUrl == null
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(Icons.person, size: 56, color: Colors.deepPurple),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "Sin foto",
+                                      style: TextStyle(color: Colors.deepPurple),
+                                    ),
+                                  ],
+                                )
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        "${profile.nombre ?? ''} ${profile.apellido ?? ''}",
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        profile.email,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.deepPurple.shade700,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        "Edad: ${profile.edad}",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.deepPurple.shade700,
+                            ),
+                      ),
+                      const SizedBox(height: 40),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            ref.read(authControllerProvider.notifier).logout(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text(
+                            "Cerrar Sesión",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "${profile.nombre ?? ''} ${profile.apellido ?? ''}",
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(profile.email),
-                  const SizedBox(height: 8),
-                  Text("Edad: ${profile.edad}"),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: () {
-                      ref.read(authControllerProvider.notifier).logout(context);
-                    },
-                    child: const Text("Cerrar Sesión"),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.refresh),
-                    label: const Text("Actualizar Perfil"),
-                    onPressed: () {
-                      ref.invalidate(userProfileProvider);
-                    },
-                  ),
-                ],
+                ),
               ),
             ),
           ),

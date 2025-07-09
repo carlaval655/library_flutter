@@ -91,9 +91,14 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("¡Registro exitoso!")),
       );
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/home');
-      });
+      if (res.session != null) {
+  // Si el usuario quedó logueado automáticamente, lo deslogueamos para forzar login manual
+  await Supabase.instance.client.auth.signOut();
+}
+
+WidgetsBinding.instance.addPostFrameCallback((_) {
+  context.go('/login');
+});
     } catch (e) {
       print("Error en registro: $e");
       state = AsyncError(e, StackTrace.current);
