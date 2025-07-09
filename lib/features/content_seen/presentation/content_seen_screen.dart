@@ -321,10 +321,19 @@ class ContentSeenScreen extends ConsumerWidget {
                                                         padding: const EdgeInsets.symmetric(
                                                             horizontal: 18, vertical: 12),
                                                       ),
-                                                      onPressed: () {
-                                                        // TODO: subir recomendación a Supabase
+                                                      onPressed: () async {
+                                                        print("user: ${user.id}, movie: ${movie.localId}");
+                                                        final newRecommendation = {
+                                                          'userId': user.id,
+                                                          'movieId': movie.localId,
+                                                          'comentario': reviewController.text,
+                                                          'isPublic': 1,
+                                                          'createdAt': DateTime.now().toIso8601String(),
+                                                        };
+                                                        await LocalDbService().insertRecommendation(newRecommendation);
+                                                        Navigator.pop(context);
                                                         ScaffoldMessenger.of(context).showSnackBar(
-                                                          const SnackBar(content: Text("Recomendación enviada")),
+                                                          const SnackBar(content: Text("Recomendación guardada localmente")),
                                                         );
                                                       },
                                                       icon: const Icon(Icons.recommend, color: Color(0xFF7B1FA2)),

@@ -1,4 +1,5 @@
 import 'package:my_movie_tracker/features/content_seen/domain/movie_model.dart';
+import 'package:my_movie_tracker/features/recommendations/data/recommendations_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -35,7 +36,18 @@ class LocalDbService {
             genre TEXT,
             duration INTEGER,
             watchedAt TEXT
-          )
+          );
+        ''');
+        await db.execute('''
+          CREATE TABLE recommendations (
+            localId INTEGER PRIMARY KEY AUTOINCREMENT,
+            remoteId TEXT,
+            userId TEXT,
+            movieId INTEGER,
+            comentario TEXT,
+            isPublic INTEGER,
+            createdAt TEXT
+          );
         ''');
       },
     );
@@ -86,4 +98,61 @@ class LocalDbService {
       whereArgs: [movie.localId],
     );
   }
+
+  Future<void> insertRecommendation(Map<String, dynamic> recommendation) async {
+    final db = await database;
+    await db.insert('recommendations', recommendation);
+  }
+  
+  Future<List<RecommendationModel>> getRecommendationsByUserId(String userId) async {
+    final db = await database;
+    final result = await db.query(
+      'recommendations',
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'createdAt DESC',
+    );
+    return result.map((e) => RecommendationModel.fromMap(e)).toList();
+  }
+
+ Future<List<RecommendationWithMovie>> getRecommendationsWithMovieDetailsByUserId(String userId) async {
+  final db = await database;
+
+  // Obtener recomendaciones del usuario
+  final recResult = await db.query(
+    'recommendations',
+    where: 'userId = ?',
+    whereArgs: [userId],
+    orderBy: 'createdAt DESC',
+  );
+
+  List<RecommendationWithMovie> combined = [];
+
+  for (final recMap in recResult) {
+    final rec = RecommendationModel.fromMap(recMap);
+
+    // Buscar película asociada
+    final movieResult = await db.query(
+      'movies',
+      where: 'localId = ?',
+      whereArgs: [rec.movieId],
+    );
+
+    if (movieResult.isNotEmpty) {
+      final movie = MovieModel.fromLocalJson(movieResult.first);
+      combined.add(
+        RecommendationWithMovie(
+          recommendation: rec,
+          movie: movie,
+        ),
+      );
+    }
+  }
+
+  return combined;
+} 
 }
+
+
+  
+  
