@@ -1,3 +1,4 @@
+import 'package:my_movie_tracker/features/recommendations/presentation/recommendations_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -330,7 +331,10 @@ class ContentSeenScreen extends ConsumerWidget {
                                                           'isPublic': 1,
                                                           'createdAt': DateTime.now().toIso8601String(),
                                                         };
+                                                      
                                                         await LocalDbService().insertRecommendation(newRecommendation);
+                                                        ref.invalidate(movies_provider.moviesProvider(user.id));
+                                                        ref.invalidate(recommendationsProvider);
                                                         Navigator.pop(context);
                                                         ScaffoldMessenger.of(context).showSnackBar(
                                                           const SnackBar(content: Text("Recomendación guardada localmente")),
