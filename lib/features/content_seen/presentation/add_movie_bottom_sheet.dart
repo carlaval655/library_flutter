@@ -96,25 +96,46 @@ class _AddMovieBottomSheetState extends ConsumerState<AddMovieBottomSheet> {
                       title: Text(movie.title),
                       subtitle: Text(movie.releaseDate),
                       onTap: () async {
-                        /// Guardamos la película
+                        print("Película seleccionada: ${movie.title}");
                         final userId = Supabase.instance.client.auth.currentUser?.id ?? "NO_USER";
-                        final newMovie = MovieModel(
-                          userId: userId,
-                          title: movie.title,
-                          year: int.tryParse(movie.releaseDate.split('-').first) ?? 0,
-                          rating: 0,
-                          review: "",
-                          status: "Pendiente",
-                          posterPath: movie.posterPath != null
-                              ? "https://image.tmdb.org/t/p/w500${movie.posterPath}"
-                              : null,
-                          watchedAt: DateTime.now(),
-                          genre: movie.genreNames?.join(', ') ?? "",
-                          duration: movie.duration ?? 0,
-                        );
-                        await dbService.insertMovie(newMovie);
-                        ref.invalidate(moviesProvider);
-                        Navigator.pop(context);
+
+                        try {
+                          final fullDetails = await ref.read(searchMoviesProvider.notifier).apiService.getMovieDetails(movie.id);
+
+                          final year = (fullDetails.releaseDate.isNotEmpty && fullDetails.releaseDate.length >= 4)
+                              ? int.tryParse(fullDetails.releaseDate.substring(0, 4)) ?? 0
+                              : 0;
+
+                          final genre = (fullDetails.genreNames != null && fullDetails.genreNames!.isNotEmpty)
+                              ? fullDetails.genreNames!.join(', ')
+                              : "Desconocido";
+
+                          final duration = fullDetails.duration ?? 0;
+
+                          final newMovie = MovieModel(
+                            userId: userId,
+                            title: fullDetails.title,
+                            year: year,
+                            rating: 0,
+                            review: "",
+                            status: "Pendiente",
+                            posterPath: fullDetails.posterPath != null
+                                ? "https://image.tmdb.org/t/p/w500${fullDetails.posterPath}"
+                                : null,
+                            watchedAt: DateTime.now(),
+                            genre: genre,
+                            duration: duration,
+                          );
+
+                          await dbService.insertMovie(newMovie);
+                          ref.invalidate(moviesProvider);
+                          Navigator.pop(context);
+                        } catch (e) {
+                          print("Error al obtener detalles de la película: $e");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Error al obtener detalles de la película")),
+                          );
+                        }
                       },
                     );
                   },
