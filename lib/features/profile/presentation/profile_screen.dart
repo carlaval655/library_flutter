@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_movie_tracker/features/auth/presentation/auth_controller.dart';
 
-import '../application/profile_provider.dart' as profile;
+import '../application/profile_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(profile.profileProvider);
+    final profileAsync = ref.watch(userProfileProvider);
 
     return profileAsync.when(
       data: (profile) => SingleChildScrollView(
@@ -26,12 +26,19 @@ class ProfileScreen extends ConsumerWidget {
                         ? NetworkImage(profile.fotoUrl!)
                         : null,
                     child: profile.fotoUrl == null
-                        ? const Icon(Icons.person, size: 50)
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.person, size: 50),
+                              const SizedBox(height: 8),
+                              const Text("Sin foto"),
+                            ],
+                          )
                         : null,
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    "${profile.nombre} ${profile.apellido}",
+                    "${profile.nombre ?? ''} ${profile.apellido ?? ''}",
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
@@ -40,11 +47,19 @@ class ProfileScreen extends ConsumerWidget {
                   Text("Edad: ${profile.edad}"),
                   const SizedBox(height: 32),
                   ElevatedButton(
-  onPressed: () {
-    ref.read(authControllerProvider.notifier).logout(context);
-  },
-  child: const Text("Cerrar Sesión"),
-),
+                    onPressed: () {
+                      ref.read(authControllerProvider.notifier).logout(context);
+                    },
+                    child: const Text("Cerrar Sesión"),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label: const Text("Actualizar Perfil"),
+                    onPressed: () {
+                      ref.invalidate(userProfileProvider);
+                    },
+                  ),
                 ],
               ),
             ),

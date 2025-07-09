@@ -105,29 +105,7 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
 
   Future<void> logout(BuildContext context) async {
     await Supabase.instance.client.auth.signOut();
-    ref.invalidate(profileProvider);
     context.go('/login');
   }
 }
 
-final profileProvider = FutureProvider<Map<String, dynamic>>((ref) async {
-  final session = Supabase.instance.client.auth.currentSession;
-  if (session == null) {
-    throw Exception("No hay sesión activa.");
-  }
-  final user = session.user;
-  if (user == null) {
-    throw Exception("No hay usuario autenticado.");
-  }
-  final data = await Supabase.instance.client
-      .from('profiles')
-      .select()
-      .eq('id', user.id)
-      .single();
-
-  if (data == null) {
-    throw Exception("Perfil no encontrado.");
-  }
-
-  return data as Map<String, dynamic>;
-});

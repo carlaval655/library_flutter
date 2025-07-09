@@ -4,9 +4,13 @@ description: App para tracking de películas y series.
 environment:
   sdk: ">=3.0.0 <4.0.0"
 
+flutter:
+  uses-material-design: true
+
 dependencies:
   flutter:
     sdk: flutter
+  
 
   flutter_riverpod: ^2.5.1
   sqflite: ^2.3.2
