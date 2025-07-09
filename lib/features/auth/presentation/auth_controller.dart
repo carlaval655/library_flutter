@@ -1,18 +1,22 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:my_movie_tracker/core/services/image_service.dart';
+import 'package:my_movie_tracker/features/profile/application/profile_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final authControllerProvider =
     StateNotifierProvider<AuthController, AsyncValue<void>>(
-  (ref) => AuthController(),
+  (ref) => AuthController(ref),
 );
 final ImageService _imageService = ImageService();
 
 class AuthController extends StateNotifier<AsyncValue<void>> {
-  AuthController() : super(const AsyncData(null));
+  final Ref ref;
+  AuthController(this.ref) : super(const AsyncData(null));
 
   Future<void> login({
     required String email,
@@ -30,7 +34,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("¡Login exitoso!")),
         );
-        // TODO: Navegar a Home
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/home');
+        });
       } else {
         throw Exception("Credenciales inválidas");
       }
@@ -85,7 +91,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("¡Registro exitoso!")),
       );
-      // TODO: Navegar a Home
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/home');
+      });
     } catch (e) {
       print("Error en registro: $e");
       state = AsyncError(e, StackTrace.current);
@@ -94,4 +102,32 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
       );
     }
   }
+
+  Future<void> logout(BuildContext context) async {
+    await Supabase.instance.client.auth.signOut();
+    ref.invalidate(profileProvider);
+    context.go('/login');
+  }
 }
+
+final profileProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+  final session = Supabase.instance.client.auth.currentSession;
+  if (session == null) {
+    throw Exception("No hay sesión activa.");
+  }
+  final user = session.user;
+  if (user == null) {
+    throw Exception("No hay usuario autenticado.");
+  }
+  final data = await Supabase.instance.client
+      .from('profiles')
+      .select()
+      .eq('id', user.id)
+      .single();
+
+  if (data == null) {
+    throw Exception("Perfil no encontrado.");
+  }
+
+  return data as Map<String, dynamic>;
+});

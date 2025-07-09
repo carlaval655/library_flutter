@@ -158,6 +158,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "go_router",
+      "rootUri": "file:///Users/carlavalencia/.pub-cache/hosted/pub.dev/go_router-13.2.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "gotrue",
       "rootUri": "file:///Users/carlavalencia/.pub-cache/hosted/pub.dev/gotrue-2.13.0",
       "packageUri": "lib/",
