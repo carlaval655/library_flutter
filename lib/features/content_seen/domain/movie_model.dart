@@ -8,7 +8,10 @@ class MovieModel {
   final String review;
   final String status;
   final String? posterUrl;      // URL Supabase
-  final String? posterPath;     // Local path
+  final String? posterPath; 
+  final DateTime? watchedAt; // Fecha en que vio la película
+final String? genre;       // Género (opcional, de la API)
+final int? duration;       // Duración en minutos    // Local path
 
   MovieModel({
     this.localId,
@@ -21,6 +24,10 @@ class MovieModel {
     required this.status,
     this.posterUrl,
     this.posterPath,
+    this.watchedAt,
+    this.genre,
+    this.duration,
+
   });
 
   // Para guardar en Supabase
@@ -34,6 +41,10 @@ class MovieModel {
       'review': review,
       'status': status,
       'poster_url': posterUrl,
+      'watched_at': watchedAt?.toIso8601String(),
+      'genre': genre,
+      'duration': duration,
+
     };
   }
 
@@ -48,6 +59,12 @@ class MovieModel {
       review: json['review'] as String,
       status: json['status'] as String,
       posterUrl: json['poster_url'] as String?,
+      posterPath: json['poster_path'] as String?,
+      watchedAt: json['watched_at'] != null
+          ? DateTime.parse(json['watched_at'] as String)
+          : null,
+      genre: json['genre'] as String?,
+      duration: json['duration'] as int?,
     );
   }
 
@@ -63,7 +80,44 @@ class MovieModel {
       'review': review,
       'status': status,
       'posterPath': posterPath,
+      'watchedAt': watchedAt?.toIso8601String(),
+      'genre': genre,
+      'duration': duration,
+
     };
+  }
+
+  //copyWith
+  MovieModel copyWith({
+    int? localId,
+    String? remoteId,
+    String? userId,
+    String? title,
+    int? year,
+    double? rating,
+    String? review,
+    String? status,
+    String? posterUrl,
+    String? posterPath,
+    DateTime? watchedAt,
+    String? genre,
+    int? duration,
+  }) {
+    return MovieModel(
+      localId: localId ?? this.localId,
+      remoteId: remoteId ?? this.remoteId,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      year: year ?? this.year,
+      rating: rating ?? this.rating,
+      review: review ?? this.review,
+      status: status ?? this.status,
+      posterUrl: posterUrl ?? this.posterUrl,
+      posterPath: posterPath ?? this.posterPath,
+      watchedAt: watchedAt ?? this.watchedAt,
+      genre: genre ?? this.genre,
+      duration: duration ?? this.duration,
+    );
   }
 
   // Para leer de SQLite
@@ -78,6 +132,12 @@ class MovieModel {
       review: json['review'] as String,
       status: json['status'] as String,
       posterPath: json['posterPath'] as String?,
+      watchedAt: json['watchedAt'] != null
+          ? DateTime.parse(json['watchedAt'] as String)
+          : null,
+      genre: json['genre'] as String?,
+      duration: json['duration'] as int?,
+
     );
   }
 }

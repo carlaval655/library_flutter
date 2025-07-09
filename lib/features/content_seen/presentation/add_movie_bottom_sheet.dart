@@ -101,14 +101,16 @@ class _AddMovieBottomSheetState extends ConsumerState<AddMovieBottomSheet> {
                         final newMovie = MovieModel(
                           userId: userId,
                           title: movie.title,
-                          year: int.tryParse(
-                                  movie.releaseDate.split('-').first) ??
-                              0,
+                          year: int.tryParse(movie.releaseDate.split('-').first) ?? 0,
                           rating: 0,
                           review: "",
                           status: "Pendiente",
-                          posterPath:
-                              "https://image.tmdb.org/t/p/w500${movie.posterPath}",
+                          posterPath: movie.posterPath != null
+                              ? "https://image.tmdb.org/t/p/w500${movie.posterPath}"
+                              : null,
+                          watchedAt: DateTime.now(),
+                          genre: movie.genreNames?.join(', ') ?? "",
+                          duration: movie.duration ?? 0,
                         );
                         await dbService.insertMovie(newMovie);
                         ref.invalidate(moviesProvider);

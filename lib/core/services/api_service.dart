@@ -24,6 +24,8 @@ class MovieApiResult {
   final String? posterPath;
   final String overview;
   final String releaseDate;
+  final List<String>? genreNames;
+  final int? duration;
 
   MovieApiResult({
     required this.id,
@@ -31,6 +33,8 @@ class MovieApiResult {
     required this.posterPath,
     required this.overview,
     required this.releaseDate,
+    this.genreNames,
+    this.duration,
   });
 
   factory MovieApiResult.fromJson(Map<String, dynamic> json) {
@@ -40,6 +44,10 @@ class MovieApiResult {
       posterPath: json['poster_path'],
       overview: json['overview'] ?? '',
       releaseDate: json['release_date'] ?? '',
+      genreNames: (json['genre_ids'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList(),
+      duration: json['runtime'],
     );
   }
 }

@@ -31,7 +31,10 @@ class LocalDbService {
             rating REAL,
             review TEXT,
             status TEXT,
-            posterPath TEXT
+            posterPath TEXT,
+            genre TEXT,
+            duration INTEGER,
+            watchedAt TEXT
           )
         ''');
       },
@@ -64,4 +67,23 @@ class LocalDbService {
   await deleteDatabase(path);
   print("Database deleted!");
 }
+
+  Future<void> deleteMovie(int localId) async {
+    final db = await database;
+    await db.delete(
+      'movies',
+      where: 'localId = ?',
+      whereArgs: [localId],
+    );
+  }
+
+  Future<void> updateMovie(MovieModel movie) async {
+    final db = await database;
+    await db.update(
+      'movies',
+      movie.toLocalJson(),
+      where: 'localId = ?',
+      whereArgs: [movie.localId],
+    );
+  }
 }
