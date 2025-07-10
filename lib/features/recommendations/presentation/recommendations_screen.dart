@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_movie_tracker/features/friends/presentation/friends_screen.dart';
 import 'package:my_movie_tracker/features/profile/application/current_user_provider.dart';
 import 'package:my_movie_tracker/features/recommendations/data/recommendations_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -49,6 +50,7 @@ class RecommendationsScreen extends ConsumerWidget {
             'genre': rec.movie.genre,
             'duration': rec.movie.duration,
             'poster_path': rec.movie.posterPath,
+            'rating_stars': rec.movie.rating.toInt(),
           }).select('id').single();
 
           if (insertMovieResponse == null || !insertMovieResponse.containsKey('id')) {
@@ -69,7 +71,7 @@ class RecommendationsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('¡Recomendación publicada!')),
         );
-
+ref.invalidate(userRecommendationsProvider);
         ref.invalidate(recommendationsProvider);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -80,8 +82,18 @@ class RecommendationsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Mis Recomendaciones"),
+        title: Text("Mis Recomendaciones", 
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              color: Colors.white,
+            )),
+        centerTitle: true,
+
+
         backgroundColor: Colors.deepPurple,
+        
+        
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -170,7 +182,8 @@ class RecommendationsScreen extends ConsumerWidget {
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
                             onPressed: () => makePublic(rec),
-                            child: Text('Hacer pública'),
+                            child: Text('Hacer pública',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.deepPurple,
                             ),

@@ -330,6 +330,7 @@ class ContentSeenScreen extends ConsumerWidget {
                                                           'comentario': reviewController.text,
                                                           'isPublic': 1,
                                                           'createdAt': DateTime.now().toIso8601String(),
+                                                          'rating': selectedRating,
                                                         };
                                                       
                                                         await LocalDbService().insertRecommendation(newRecommendation);
