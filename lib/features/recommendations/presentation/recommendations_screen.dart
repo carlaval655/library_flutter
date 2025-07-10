@@ -21,6 +21,62 @@ class RecommendationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final recommendationsAsync = ref.watch(recommendationsProvider);
+    final supabase = Supabase.instance.client;
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.value;
+
+    Future<void> makePublic(RecommendationWithMovie rec) async {
+      if (user == null) return;
+
+      try {
+        // Check if movie exists in remote 'movies' table by api_movie_id
+        final movieResponse = await supabase
+            .from('movies')
+            .select('id')
+            .eq('api_movie_id', rec.movie.apiMovieId ?? '')
+            .limit(1)
+            .maybeSingle();
+
+        String movieId;
+        if (movieResponse != null) {
+          movieId = movieResponse['id'];
+        } else {
+          // Insert movie and get id
+          final insertMovieResponse = await supabase.from('movies').insert({
+            'api_movie_id': rec.movie.apiMovieId,
+            'title': rec.movie.title,
+            'year': rec.movie.year,
+            'genre': rec.movie.genre,
+            'duration': rec.movie.duration,
+            'poster_path': rec.movie.posterPath,
+          }).select('id').single();
+
+          if (insertMovieResponse == null || !insertMovieResponse.containsKey('id')) {
+            throw Exception('Error al insertar la película');
+          }
+          movieId = insertMovieResponse['id'] as String;
+        }
+
+        // Insert recommendation with is_public true
+        await supabase.from('recommendations').insert({
+          'movie_id': movieId,
+          'user_id': user.id,
+          'comentario': rec.recommendation.comentario,
+          'is_public': true,
+          'created_at': DateTime.now().toIso8601String(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('¡Recomendación publicada!')),
+        );
+
+        ref.invalidate(recommendationsProvider);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al publicar: $e')),
+        );
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -108,6 +164,17 @@ class RecommendationsScreen extends ConsumerWidget {
                         Text(
                           "Recomendado el ${rec.recommendation.createdAt.toLocal().toString().split(".")[0]}",
                           style: TextStyle(color: Colors.grey[700]),
+                        ),
+                        SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            onPressed: () => makePublic(rec),
+                            child: Text('Hacer pública'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple,
+                            ),
+                          ),
                         ),
                       ],
                     ),

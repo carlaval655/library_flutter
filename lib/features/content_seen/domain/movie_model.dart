@@ -10,8 +10,9 @@ class MovieModel {
   final String? posterUrl;      // URL Supabase
   final String? posterPath; 
   final DateTime? watchedAt; // Fecha en que vio la película
-final String? genre;       // Género (opcional, de la API)
-final int? duration;       // Duración en minutos    // Local path
+  final String? genre;       // Género (opcional, de la API)
+  final int? duration;       // Duración en minutos    // Local path
+  final String? apiMovieId;
 
   MovieModel({
     this.localId,
@@ -27,7 +28,7 @@ final int? duration;       // Duración en minutos    // Local path
     this.watchedAt,
     this.genre,
     this.duration,
-
+    this.apiMovieId,
   });
 
   // Para guardar en Supabase
@@ -44,7 +45,7 @@ final int? duration;       // Duración en minutos    // Local path
       'watched_at': watchedAt?.toIso8601String(),
       'genre': genre,
       'duration': duration,
-
+      'api_movie_id': apiMovieId,
     };
   }
 
@@ -65,6 +66,7 @@ final int? duration;       // Duración en minutos    // Local path
           : null,
       genre: json['genre'] as String?,
       duration: json['duration'] as int?,
+      apiMovieId: json['api_movie_id'] as String?,
     );
   }
 
@@ -83,7 +85,7 @@ final int? duration;       // Duración en minutos    // Local path
       'watchedAt': watchedAt?.toIso8601String(),
       'genre': genre,
       'duration': duration,
-
+      'apiMovieId': apiMovieId,
     };
   }
 
@@ -102,6 +104,7 @@ final int? duration;       // Duración en minutos    // Local path
     DateTime? watchedAt,
     String? genre,
     int? duration,
+    String? apiMovieId,
   }) {
     return MovieModel(
       localId: localId ?? this.localId,
@@ -117,6 +120,7 @@ final int? duration;       // Duración en minutos    // Local path
       watchedAt: watchedAt ?? this.watchedAt,
       genre: genre ?? this.genre,
       duration: duration ?? this.duration,
+      apiMovieId: apiMovieId ?? this.apiMovieId,
     );
   }
 
@@ -137,7 +141,7 @@ final int? duration;       // Duración en minutos    // Local path
           : null,
       genre: json['genre'] as String?,
       duration: json['duration'] as int?,
-
+      apiMovieId: json['apiMovieId'] as String?,
     );
   }
 }

@@ -35,7 +35,8 @@ class LocalDbService {
             posterPath TEXT,
             genre TEXT,
             duration INTEGER,
-            watchedAt TEXT
+            watchedAt TEXT,
+                apiMovieId TEXT
           );
         ''');
         await db.execute('''

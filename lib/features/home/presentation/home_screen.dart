@@ -42,9 +42,9 @@ class HomeScreen extends ConsumerWidget {
         elevation: 10,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil', backgroundColor: Color.fromARGB(255, 174, 148, 210)),
-          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Visto'),
-          BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Recomendados'),
-          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Amigos'),
+          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Visto',  backgroundColor: Color.fromARGB(255, 174, 148, 210)),
+          BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Recomendados',  backgroundColor: Color.fromARGB(255, 174, 148, 210)),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explorar',  backgroundColor: Color.fromARGB(255, 174, 148, 210)),
         ],
       ),
     );

@@ -46,7 +46,11 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
+        //SnackBar(content: Text("Error: ${e.toString()}")),
+        SnackBar(
+          content: Text("Credenciales inválidas"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
